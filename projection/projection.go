@@ -6,40 +6,64 @@ import (
 
 	"github.com/lukeshiner/raytrace/canvas"
 	"github.com/lukeshiner/raytrace/colour"
+	"github.com/lukeshiner/raytrace/material"
+	"github.com/lukeshiner/raytrace/matrix"
+	"github.com/lukeshiner/raytrace/object"
 	"github.com/lukeshiner/raytrace/ray"
 	"github.com/lukeshiner/raytrace/vector"
 )
 
+var drawCol = colour.New(1, 0, 0)
+var background = colour.New(0, 0, 0)
+var canvasSize = 100
+var wallSize = 7.0
+var pixelSize = wallSize / float64(canvasSize)
+var halfWall = wallSize / 2
+var rayOrigin = vector.NewPoint(0, 0, -5)
+var wallZ = 10.0
+
 func main() {
-	var r ray.Ray
+	var col colour.Colour
 	var worldX, worldY float64
-	var rayDirection, position vector.Vector
-	var xs ray.Intersections
-	col := colour.Colour{Red: 1, Green: 0, Blue: 0}
-	canvasSize := 100
-	wallSize := 7.0
-	pixelSize := wallSize / float64(canvasSize)
-	halfWall := wallSize / 2
-	rayOrigin := vector.NewPoint(0, 0, -5)
-	wallZ := 10.0
 	c := canvas.New(canvasSize, canvasSize)
-	s := ray.NewSphere()
+	s := getObject()
 	for y := 0; y < c.Height; y++ {
 		worldY = halfWall - pixelSize*float64(y)
 		for x := 0; x < c.Width; x++ {
 			worldX = -halfWall + pixelSize*float64(x)
-			position = vector.NewPoint(worldX, worldY, wallZ)
-			rayDirection = vector.Subtract(position, rayOrigin)
-			rayDirection = rayDirection.Normalize()
-			r = ray.New(rayOrigin, rayDirection)
-			xs = ray.Intersect(s, r)
-			_, err := xs.Hit()
-			if err == nil {
-				c.WritePixel(x, y, col)
-			}
+			col = calculatePixelColour(x, y, worldX, worldY, s)
+			c.WritePixel(x, y, col)
 		}
 	}
 	writePPM(c)
+}
+
+func getObject() object.Sphere {
+	s := object.NewSphere()
+	s.SetTransform(getTransform())
+	s.SetMaterial(getMaterial())
+	return s
+}
+
+func getTransform() matrix.Matrix {
+	return matrix.IdentityMatrix(4)
+}
+
+func getMaterial() material.Material {
+	return material.New()
+}
+
+func calculatePixelColour(x, y int, worldX, worldY float64, s object.Sphere) colour.Colour {
+	position := vector.NewPoint(worldX, worldY, wallZ)
+	rayDirection := vector.Subtract(position, rayOrigin)
+	rayDirection = rayDirection.Normalize()
+	r := ray.New(rayOrigin, rayDirection)
+	xs := ray.Intersect(s, r)
+	_, err := xs.Hit()
+	if err == nil {
+		return drawCol
+	}
+	return background
 }
 
 func writePPM(c canvas.Canvas) {
