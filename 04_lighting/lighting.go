@@ -9,8 +9,8 @@ import (
 	"github.com/lukeshiner/raytrace/light"
 	"github.com/lukeshiner/raytrace/material"
 	"github.com/lukeshiner/raytrace/matrix"
-	"github.com/lukeshiner/raytrace/object"
 	"github.com/lukeshiner/raytrace/ray"
+	"github.com/lukeshiner/raytrace/shape"
 	"github.com/lukeshiner/raytrace/vector"
 )
 
@@ -39,8 +39,8 @@ func main() {
 	writePPM(c)
 }
 
-func getObject() object.Sphere {
-	s := object.NewSphere()
+func getObject() shape.Shape {
+	s := shape.NewSphere()
 	s.SetTransform(getTransform())
 	s.SetMaterial(getMaterial())
 	return s
@@ -56,24 +56,24 @@ func getMaterial() material.Material {
 	return m
 }
 
-func getLight() light.Point {
+func getLight() light.Light {
 	return light.NewPoint(colour.New(1, 1, 1), vector.NewPoint(-10, 10, -10))
 }
 
-func calculatePixelColour(x, y int, worldX, worldY float64, s object.Sphere, l light.Point) colour.Colour {
+func calculatePixelColour(x, y int, worldX, worldY float64, s shape.Shape, l light.Light) colour.Colour {
 	position := vector.NewPoint(worldX, worldY, wallZ)
 	rayDirection := vector.Subtract(position, rayOrigin)
 	rayDirection = rayDirection.Normalize()
 	r := ray.New(rayOrigin, rayDirection)
 	r.Direction = r.Direction.Normalize()
-	xs := ray.Intersect(s, r)
+	xs := shape.Intersect(s, r)
 	hit, err := xs.Hit()
 	if err == nil {
 		// Ray hits
 		point := r.Position(hit.T)
-		normal := hit.Object.NormalAt(point)
+		normal := shape.NormalAt(hit.Object, point)
 		eye := r.Direction.Negate()
-		return ray.Lighting(s.Material, l, point, eye, normal)
+		return shape.Lighting(s.Material(), l, point, eye, normal, false)
 	}
 	// Ray misses
 	return background

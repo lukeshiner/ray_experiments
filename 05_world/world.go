@@ -11,7 +11,7 @@ import (
 	"github.com/lukeshiner/raytrace/light"
 	"github.com/lukeshiner/raytrace/material"
 	"github.com/lukeshiner/raytrace/matrix"
-	"github.com/lukeshiner/raytrace/object"
+	"github.com/lukeshiner/raytrace/shape"
 	"github.com/lukeshiner/raytrace/vector"
 	"github.com/lukeshiner/raytrace/world"
 )
@@ -38,8 +38,8 @@ func getWorld() world.World {
 	return world
 }
 
-func getObjects() []object.Object {
-	return []object.Object{
+func getObjects() []shape.Shape {
+	return []shape.Shape{
 		getFloor(), getLeftWall(), getRightWall(), getLargeSphere(), getMiddleSphere(),
 		getSmallSphere(),
 	}
@@ -52,15 +52,15 @@ func getFloorMaterial() material.Material {
 	return m
 }
 
-func getFloor() object.Object {
-	floor := object.NewSphere()
+func getFloor() shape.Shape {
+	floor := shape.NewSphere()
 	floor.SetTransform(matrix.ScalingMatrix(10, 0.01, 10))
 	floor.SetMaterial(getFloorMaterial())
 	return floor
 }
 
-func getLeftWall() object.Object {
-	wall := object.NewSphere()
+func getLeftWall() shape.Shape {
+	wall := shape.NewSphere()
 	t := matrix.Multiply(matrix.TranslationMatrix(0, 0, 5), matrix.Multiply(
 		matrix.RotationYMatrix(0-(math.Pi/4)), matrix.Multiply(
 			matrix.RotationXMatrix(math.Pi/2), matrix.ScalingMatrix(10, 0.01, 10))))
@@ -69,8 +69,8 @@ func getLeftWall() object.Object {
 	return wall
 }
 
-func getRightWall() object.Object {
-	wall := object.NewSphere()
+func getRightWall() shape.Shape {
+	wall := shape.NewSphere()
 	t := matrix.Multiply(matrix.TranslationMatrix(0, 0, 5), matrix.Multiply(
 		matrix.RotationYMatrix(math.Pi/4), matrix.Multiply(
 			matrix.RotationXMatrix(math.Pi/2), matrix.ScalingMatrix(10, 0.01, 10))))
@@ -79,8 +79,8 @@ func getRightWall() object.Object {
 	return wall
 }
 
-func getLargeSphere() object.Object {
-	s := object.NewSphere()
+func getLargeSphere() shape.Shape {
+	s := shape.NewSphere()
 	s.SetTransform(matrix.TranslationMatrix(-0.5, 1, 0.5))
 	m := material.New()
 	m.Colour = colour.New(0.1, 1, 0.5)
@@ -90,8 +90,8 @@ func getLargeSphere() object.Object {
 	return s
 }
 
-func getSmallSphere() object.Object {
-	s := object.NewSphere()
+func getSmallSphere() shape.Shape {
+	s := shape.NewSphere()
 	s.SetTransform(matrix.Multiply(
 		matrix.TranslationMatrix(1.5, 0.5, -0.5), matrix.ScalingMatrix(0.5, 0.5, 0.5)))
 	m := material.New()
@@ -102,8 +102,8 @@ func getSmallSphere() object.Object {
 	return s
 }
 
-func getMiddleSphere() object.Object {
-	s := object.NewSphere()
+func getMiddleSphere() shape.Shape {
+	s := shape.NewSphere()
 	s.SetTransform(matrix.Multiply(
 		matrix.TranslationMatrix(-1.5, 0.33, -0.75), matrix.ScalingMatrix(0.33, 0.33, 0.33)))
 	m := material.New()

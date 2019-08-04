@@ -8,8 +8,8 @@ import (
 	"github.com/lukeshiner/raytrace/colour"
 	"github.com/lukeshiner/raytrace/material"
 	"github.com/lukeshiner/raytrace/matrix"
-	"github.com/lukeshiner/raytrace/object"
 	"github.com/lukeshiner/raytrace/ray"
+	"github.com/lukeshiner/raytrace/shape"
 	"github.com/lukeshiner/raytrace/vector"
 )
 
@@ -38,8 +38,8 @@ func main() {
 	writePPM(c)
 }
 
-func getObject() object.Sphere {
-	s := object.NewSphere()
+func getObject() shape.Shape {
+	s := shape.NewSphere()
 	s.SetTransform(getTransform())
 	s.SetMaterial(getMaterial())
 	return s
@@ -53,12 +53,12 @@ func getMaterial() material.Material {
 	return material.New()
 }
 
-func calculatePixelColour(x, y int, worldX, worldY float64, s object.Sphere) colour.Colour {
+func calculatePixelColour(x, y int, worldX, worldY float64, s shape.Shape) colour.Colour {
 	position := vector.NewPoint(worldX, worldY, wallZ)
 	rayDirection := vector.Subtract(position, rayOrigin)
 	rayDirection = rayDirection.Normalize()
 	r := ray.New(rayOrigin, rayDirection)
-	xs := ray.Intersect(s, r)
+	xs := shape.Intersect(s, r)
 	_, err := xs.Hit()
 	if err == nil {
 		return drawCol

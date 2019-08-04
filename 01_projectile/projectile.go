@@ -11,12 +11,12 @@ import (
 
 func main() {
 	canvas := canvas.New(900, 550)
-	v := vector.MakeVector(1, 1.0, 0)
+	v := vector.NewVector(1, 1.0, 0)
 	v = v.Normalize()
-	v = v.ScalarMult(11.25)
-	p := projectile{vector.MakePoint(0, 1, 0), v}
+	v = v.ScalarMultiply(11.25)
+	p := projectile{vector.NewPoint(0, 1, 0), v}
 	p.velocity = p.velocity.Normalize()
-	env := environment{vector.MakePoint(0, -0.1, 0), vector.MakeVector(-0.01, 0, 0)}
+	env := environment{vector.NewPoint(0, -0.1, 0), vector.NewVector(-0.01, 0, 0)}
 	ticks := 0
 	for {
 		tick(&env, &p)
@@ -40,11 +40,11 @@ type environment struct {
 }
 
 func tick(env *environment, p *projectile) {
-	p.position = p.position.Add(&p.velocity)
-	p.velocity = p.velocity.Add(&env.gravity)
-	p.velocity = p.velocity.Add(&env.wind)
+	p.position = vector.Add(p.position, p.velocity)
+	p.velocity = vector.Add(p.velocity, env.gravity)
+	p.velocity = vector.Add(p.velocity, env.wind)
 	p.velocity = p.velocity.Normalize()
-	p.velocity = p.velocity.ScalarMult(11.25)
+	p.velocity = p.velocity.ScalarMultiply(11.25)
 }
 
 func draw(c *canvas.Canvas, p *projectile) {
